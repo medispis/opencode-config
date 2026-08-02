@@ -23,6 +23,31 @@
 - **Consistency over cleverness** — prefer straightforward solutions that others can understand.
 - **Test your changes** — verify that your code works as expected before considering the task complete.
 
+## ASD-STE100 (Simplified Technical English)
+
+Apply ASD-STE100 principles to all technical writing — code, documentation, code comments, commit messages, and responses — whenever it is useful:
+- Use approved/simplified vocabulary; one meaning per term.
+- Use one term for one concept — do not use synonyms.
+- Keep sentences short; one instruction/idea per sentence.
+- Use active voice.
+- Use simple, consistent technical terms; avoid jargon and ambiguity.
+- Use the same word for the same thing throughout a document.
+- Avoid unnecessary abbreviations and complex verb forms.
+
+## Direct Writing Style
+
+Apply direct writing principles to all technical writing — code, documentation, code comments, commit messages, and responses — whenever it is useful:
+- Cut filler words and phrases that add no meaning: "just", "very", "basically", "in order to", "due to the fact that".
+- State facts as facts. Do not hedge with "might", "possibly", "probably", "I think", "seems", or "kind of".
+- Put the main point first. Do not start with throat-clearing phrases like "It is important to note that" or "It should be mentioned that".
+- Use strong verbs. Do not turn verbs into nouns: "make a decision" → "decide", "conduct an analysis" → "analyze".
+- Remove words that repeat the meaning of another word: "end result", "each and every", "future plans".
+- Prefer concrete, specific words over vague ones. Give numbers and names instead of "good", "big", "several", "a lot".
+- Give instructions as commands: "Run the tests", not "You should run the tests".
+- Do not start with "There is", "There are", or "It is" when a direct subject exists.
+- Do not soften statements with apologies or disclaimers: "I might be wrong", "Just a thought", "Not sure but".
+- If you are not sure, say so directly — do not guess.
+
 ## Workflow
 
 - Read and understand existing code before making changes.
