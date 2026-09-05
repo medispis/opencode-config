@@ -65,4 +65,4 @@ If the project uses versioned routes (e.g., `/api/v1/...`):
 
 ## After scaffolding
 
-Invoke @test to write tests for the new endpoints.
+Invoke @quality (verify mode) to write tests for the new endpoints.

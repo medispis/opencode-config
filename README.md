@@ -10,6 +10,8 @@ Personal configuration for OpenCode AI — a multi-agent system with specialized
 
 - [Agents](#agents)
 - [Skills](#skills)
+- [Commands](#commands)
+- [Workflow](#workflow)
 - [Getting Started](#getting-started)
 - [Requirements](#requirements)
 - [Quick Install](#quick-install)
@@ -20,37 +22,30 @@ Personal configuration for OpenCode AI — a multi-agent system with specialized
 
 ## Agents
 
-This configuration defines **17 specialized agents**, each tuned for a specific domain in the software development lifecycle. Agents are invoked via `@name` and have dedicated temperature settings optimized for their role.
+This configuration defines **9 specialized agents**, each tuned for a specific domain in the software development lifecycle. Agents are invoked via `@name` and have dedicated temperature settings optimized for their role.
+
+Follow the standard pipeline: plan → build → quality + defensive-security → docs / delivery.
 
 | Agent | Purpose |
 |-------|---------|
 | `@orchestrator` | Breaks down complex tasks and delegates to specialists |
-| `@build` | Implements features, writes code, and makes changes to the codebase |
-| `@debug` | Investigates bugs, errors, and unexpected behavior using the RIVAH framework |
-| `@test` | Writes, updates, and runs tests for code verification |
-| `@review` | Reviews code for quality, bugs, security issues, and best practices |
-| `@security` | Performs security audits and identifies vulnerabilities in code and dependencies |
-| `@docs` | Creates and maintains project documentation, READMEs, API docs, and code comments |
-| `@plan` | Designs technical architecture and produces implementation plans |
-| `@research` | Explores technologies, compares options, and provides evidence-based recommendations |
-| `@git` | Manages git workflows, commits, branches, PRs, and changelogs |
-| `@devops` | Handles CI/CD pipelines, Docker, deployment configs, and infrastructure |
-| `@release` | Coordinates releases — changelog, versioning, tagging, and deployment |
-| `@refactor` | Improves code structure, readability, and maintainability without changing behavior |
-| `@performance` | Profiles, analyzes, and optimizes application performance |
 | `@ask` | Asks clarifying questions to understand requirements before any work begins |
-| `@cybersecurity` | Infrastructure security, network assessments, compliance audits, and incident response |
+| `@plan` | Designs technical architecture and produces implementation plans |
+| `@build` | Implements features, writes code, and safely refactors existing code |
+| `@quality` | Diagnoses bugs, verifies code with tests, gates quality with reviews |
+| `@defensive-security` | Defensive security audit and hardening — code, dependencies, infra, CIS/NIST compliance (no exploitation) |
 | `@hacking` | Offensive security testing, penetration testing, CTF challenge solving, exploit development, and red team operations |
+| `@delivery` | Handles version control, releases, and delivery pipelines — git, semver, changelog, CI/Docker |
+| `@docs` | Creates and maintains project documentation, READMEs, API docs, and code comments |
 
 ---
 
 ## Skills
 
-Skills are domain-specific knowledge packs loaded on demand. They complement agents by providing specialized workflows, patterns, and best practices.
+Skills are domain-specific knowledge packs loaded on demand. They complement agents by providing specialized workflows, patterns, and best practices. This configuration includes **12 skills**.
 
 | Skill | Description |
 |-------|-------------|
-| **api-docs** | Generate API documentation from existing code — OpenAPI specs, README sections, SDK docs |
 | **api-scaffold** | Generate API endpoints, routes, and handlers from specifications |
 | **auth** | Design and implement authentication and authorization systems (JWT, OAuth, RBAC) |
 | **ci-pipeline** | Generate CI/CD pipeline configurations for GitHub Actions, GitLab CI, CircleCI |
@@ -60,8 +55,42 @@ Skills are domain-specific knowledge packs loaded on demand. They complement age
 | **dockerize** | Create Dockerfiles, docker-compose configs, and containerization setups |
 | **frontend** | Build UI components, pages, and frontend architecture (React, Vue, Svelte, Angular) |
 | **git-workflow** | Manage branching strategies, PR automation, changelogs, and team collaboration |
+| **gpb-to-mxb** | Converts PiBoSo GPBikes mods to MX Bikes — bikes, tracks, tyres, helmets, suits, and other assets |
 | **performance** | Profile, analyze, and optimize backend, frontend, database, and build times |
 | **testing** | Design testing strategies, write test plans, and generate comprehensive test suites |
+
+---
+
+## Commands
+
+This configuration includes **8 slash commands**. Type `/name` to run a command.
+
+| Command | Purpose | Agent |
+|---------|---------|-------|
+| `/loop` | Loop plan-build-quality until DONE criteria pass, max 5 rounds | `@orchestrator` |
+| `/plan` | Create a read-only implementation plan, change no code | `@plan` |
+| `/review` | Run parallel quality and security reviews on the current scope | `@orchestrator` |
+| `/rewind` | Save, list, or restore a work snapshot with git | `@delivery` |
+| `/ask` | Clarify requirements with targeted questions before work starts | `@ask` |
+| `/handoff` | Write a compact session handoff under 40 lines | `@docs` |
+| `/deslop` | Clean up code without changing behavior, then verify | `@build` |
+| `/ship` | Run pre-flight checks then commit, push only on request | `@delivery` |
+
+Restart opencode to load new commands.
+
+---
+
+## Workflow
+
+```
+@ask → @plan → @build → @quality + @defensive-security → @docs / @delivery
+                       ↳ @hacking (authorized offensive work only, separate from defensive audits)
+```
+
+- Start with `@ask` when requirements are unclear, then `@plan`, then `@build`.
+- Run `@quality` and `@defensive-security` in parallel after each `@build` change.
+- Finish with `@docs` or `@delivery`.
+- Route security work by type: defensive audits to `@defensive-security`, exploitation and red-team work to `@hacking`.
 
 ---
 
@@ -106,26 +135,26 @@ cd ~/.config/opencode && npm install
 ├── AGENTS.md                  # Global rules and agent definitions
 ├── CHANGELOG.md               # Version history
 ├── README.md                  # This file
-├── agents/                    # Agent definition files
+├── agents/                    # Agent definition files (9 agents)
 │   ├── ask.md
 │   ├── build.md
-│   ├── debug.md
-│   ├── devops.md
+│   ├── defensive-security.md
+│   ├── delivery.md
 │   ├── docs.md
-│   ├── git.md
 │   ├── hacking.md
-│   ├── cybersecurity.md
 │   ├── orchestrator.md
-│   ├── performance.md
 │   ├── plan.md
-│   ├── refactor.md
-│   ├── release.md
-│   ├── research.md
+│   └── quality.md
+├── commands/                  # Slash command definitions (8 commands)
+│   ├── ask.md
+│   ├── deslop.md
+│   ├── handoff.md
+│   ├── loop.md
+│   ├── plan.md
 │   ├── review.md
-│   ├── security.md
-│   └── test.md
-├── skills/                    # Skill definitions
-│   ├── api-docs/
+│   ├── rewind.md
+│   └── ship.md
+├── skills/                    # Skill definitions (12 skills)
 │   ├── api-scaffold/
 │   ├── auth/
 │   ├── ci-pipeline/
@@ -135,6 +164,7 @@ cd ~/.config/opencode && npm install
 │   ├── dockerize/
 │   ├── frontend/
 │   ├── git-workflow/
+│   ├── gpb-to-mxb/
 │   ├── performance/
 │   └── testing/
 └── package.json               # Dependencies

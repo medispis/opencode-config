@@ -2,6 +2,51 @@
 
 All notable changes to the OpenCode agent configurations will be documented in this file.
 
+## [2026-09-05] - Slash Commands (8 commands)
+
+### Added
+- 8 slash commands in `commands/`: loop, plan, review, rewind, ask, handoff, deslop, ship
+  - `/loop` (@orchestrator) - Loop plan-build-quality until DONE criteria pass, max 5 rounds
+  - `/plan` (@plan) - Create a read-only implementation plan, change no code
+  - `/review` (@orchestrator) - Run parallel quality and security reviews on the current scope
+  - `/rewind` (@delivery) - Save, list, or restore a work snapshot with git
+  - `/ask` (@ask) - Clarify requirements with targeted questions before work starts
+  - `/handoff` (@docs) - Write a compact session handoff under 40 lines
+  - `/deslop` (@build) - Clean up code without changing behavior, then verify
+  - `/ship` (@delivery) - Run pre-flight checks then commit, push only on request
+- Restart opencode to load new commands.
+
+### Security
+- Validated APPROVE by quality and defensive-security. No code changes needed, docs only.
+- Future work (4 informational hardening ideas): ship push word-boundary check, $ARGUMENTS-as-data clause, rewind input validation, review input validation.
+
+---
+
+## [2026-09-05] - 9-Agent Consolidation
+
+### Changed
+- Consolidated from 17 agents to **9 agents**: orchestrator, ask, plan, build, quality, defensive-security, hacking, delivery, docs
+  - `quality` absorbs debug, test, review, refactor, research, performance (bugs, tests, reviews, refactoring, research, optimization)
+  - `defensive-security` absorbs security, cybersecurity (audits, hardening, compliance; no exploitation)
+  - `delivery` absorbs git, devops, release (version control, CI/CD, Docker, releases, changelogs)
+  - `build` absorbs feature implementation and safe refactoring
+  - `hacking` unchanged (authorized offensive work only, separate from defensive audits)
+- Standardized pipeline: plan → build → quality + defensive-security → docs / delivery
+  - quality and defensive-security run in parallel after each build change before docs or delivery
+  - Security work routed by type: defensive audits to defensive-security, exploitation to hacking
+- **Token savings**: 8 fewer agent definition files loaded (~47% fewer agent files); fewer routing choices for orchestrator (9 targets instead of 17); parallel quality + defensive-security checks replace sequential debug → test → review → security chains
+- **Skills**: 12 skills (api-docs deleted; api-scaffold, auth, ci-pipeline, database, dep-audit, dev-env, dockerize, frontend, git-workflow, gpb-to-mxb, performance, testing retained)
+
+### Removed
+- Deleted agents: debug, test, review, security, research, git, devops, release, refactor, performance, cybersecurity
+- Deleted skill: api-docs
+
+### Security
+- No model field in any agent file (verified)
+- Defensive-security has no exploitation permissions; hacking is isolated for authorized offensive work only
+
+---
+
 ## [2026-03-23] - Major Configuration Improvements
 
 ### Added

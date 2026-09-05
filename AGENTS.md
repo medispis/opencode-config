@@ -8,7 +8,7 @@
 - Never expose secrets, API keys, or credentials in code or logs.
 - Prefer explicit over implicit. Clear variable names, clear logic.
 - Keep changes minimal and focused on the task.
-- Never mention or suggest what model any agent should use.
+- Never mention or suggest what agent configuration any agent should use.
 - **Think before acting** — understand the problem fully before implementing a solution.
 - **Validate assumptions** — don't assume requirements; verify with the user or existing code.
 - **Consider impact** — think about how changes affect other parts of the system.
@@ -53,7 +53,9 @@ Apply direct writing principles to all technical writing — code, documentation
 - Read and understand existing code before making changes.
 - Run lint/typecheck/test commands after changes if they exist in the project.
 - For complex tasks, use the orchestrator agent — it will delegate to specialists.
-- Use Tab to switch between primary agents: Orchestrator → Build → Plan.
+- Follow the standard pipeline: plan → build → quality + defensive-security → docs / delivery.
+- Run quality and defensive-security after each build change before docs or delivery.
+- Use Tab to switch between primary agents: Orchestrator → Plan → Build.
 
 ## Anti-Looping Rules
 
@@ -70,10 +72,13 @@ The orchestrator agent should:
 - **Analyze task complexity** — simple tasks (single file, clear requirements) go directly to the appropriate specialist.
 - **Break down complex tasks** — decompose multi-step work into discrete subtasks with clear boundaries.
 - **Assign one agent per subtask** — each specialist handles their domain; don't mix responsibilities.
+- **Follow the pipeline order** — start with @ask for unclear requirements, then @plan, then @build, then @quality and @defensive-security in parallel, then @docs or @delivery.
+- **Run independent checks in parallel** — @quality and @defensive-security run at the same time after @build. @docs and @delivery run last.
+- **Sequence dependent work** — @plan completes before @build starts. @build completes before @quality starts.
 - **Provide full context** — when delegating, include all relevant file paths, requirements, and constraints.
 - **Set explicit expectations** — tell each agent exactly what to deliver and when to stop.
-- **Handle dependencies** — sequence dependent tasks; run independent tasks in parallel when possible.
 - **Verify completion** — check that each specialist's output meets the requirements before proceeding.
+- **Route security work by type** — defensive audit and hardening go to @defensive-security. Exploitation and red-team work go to @hacking.
 
 ## Agent Boundaries
 
@@ -87,10 +92,10 @@ Each agent should:
 ## Agent Temperature Guidelines
 
 Different agents use different temperature values based on their purpose:
-- **0.1** (Precision-critical): review, security — must be deterministic and precise
-- **0.2** (Deterministic operations): debug, test, refactor, git, devops, release — need consistency
-- **0.3** (Balanced creativity): orchestrator, build, docs, plan, research — balance between precision and flexibility
-- **0.4** (Creative problem-solving): ask — needs to explore possibilities and ask varied questions
+- **0.1** (Precision-critical): defensive-security — must be deterministic and precise
+- **0.2** (Deterministic operations): quality, delivery — need consistency
+- **0.3** (Balanced creativity): orchestrator, plan, build, docs — balance between precision and flexibility
+- **0.4** (Creative problem-solving): ask, hacking — needs to explore possibilities and ask varied questions
 
 ## Error Handling
 
@@ -113,41 +118,27 @@ Each agent is defined in its own file under `agents/`. The table below is a quic
 
 | Agent | File | Purpose |
 |-------|------|---------|
-| @ask | `agents/ask.md` | Requirements gathering — asks clarifying questions |
-| @plan | `agents/plan.md` | Technical design & architecture — produces implementation plans |
-| @research | `agents/research.md` | Technology exploration — compares libraries, evidence-based recommendations |
-| @build | `agents/build.md` | Code implementation — writes features, modifies code |
-| @cybersecurity | `agents/cybersecurity.md` | Infrastructure & network security — assesses systems, networks, policies, compliance |
-| @hacking | `agents/hacking.md` | Offensive security & CTF — penetration testing, exploitation, red team operations |
-| @review | `agents/review.md` | Code review — checks quality, security, best practices |
-| @test | `agents/test.md` | Testing — writes and runs tests |
-| @docs | `agents/docs.md` | Documentation — creates READMEs, API docs, guides |
-| @security | `agents/security.md` | Security audit — finds vulnerabilities |
-| @debug | `agents/debug.md` | Bug investigation — uses RIVAH framework |
-| @refactor | `agents/refactor.md` | Code refactoring — improves structure without changing behavior |
-| @git | `agents/git.md` | Git/PR workflows — commits, branches, pull requests |
-| @release | `agents/release.md` | Release coordination — changelogs, versioning, tagging |
-| @devops | `agents/devops.md` | CI/CD, Docker, infrastructure |
-| @performance | `agents/performance.md` | Performance profiling and optimization |
+| @orchestrator | `agents/orchestrator.md` | Orchestrates multi-agent workflows — breaks down tasks, dispatches subagents in parallel or sequence, and coordinates the full pipeline |
+| @ask | `agents/ask.md` | Asks clarifying questions to understand requirements before any work begins |
+| @plan | `agents/plan.md` | Designs technical architecture, researches options, and produces implementation plans before code is written |
+| @build | `agents/build.md` | Implements features, writes code, and safely refactors existing code |
+| @quality | `agents/quality.md` | Diagnoses bugs, verifies code with tests, gates quality with reviews |
+| @defensive-security | `agents/defensive-security.md` | Defensive security audit and hardening — code, dependencies, infra, CIS/NIST compliance (no exploitation) |
+| @hacking | `agents/hacking.md` | Offensive security testing, penetration testing, CTF challenge solving, exploit development, and red team operations |
+| @delivery | `agents/delivery.md` | Handles version control, releases, and delivery pipelines — git, semver, changelog, CI/Docker |
+| @docs | `agents/docs.md` | Creates and maintains project documentation, READMEs, API docs, and code comments |
 
 ### When to Use Each Agent
 
-- **@ask** — Use when requirements are unclear, ambiguous, or you need user input before proceeding
-- **@plan** — Use for complex tasks requiring design decisions, architecture planning, or multi-file changes
-- **@research** — Use when comparing technologies, evaluating libraries, or needing evidence-based recommendations
-- **@build** — Use for implementing features, writing code, or making direct code changes
-- **@cybersecurity** — Use for infrastructure security assessments, network hardening, compliance audits, and defensive security operations
-- **@hacking** — Use for penetration testing, CTF challenges, exploit development, red team operations, and offensive security assessments
-- **@review** — Use after code changes to ensure quality, security, and adherence to standards
-- **@test** — Use for writing tests, running test suites, or validating functionality
-- **@docs** — Use for creating or updating documentation, READMEs, or API documentation
-- **@security** — Use for security audits, vulnerability assessments, or security-focused code reviews
-- **@debug** — Use when investigating bugs, errors, or unexpected behavior
-- **@refactor** — Use for improving code structure, readability, or maintainability without changing functionality
-- **@git** — Use for git operations, commit management, branch operations, or PR workflows
-- **@release** — Use for version management, changelog generation, or release preparation
-- **@devops** — Use for CI/CD pipelines, Docker configurations, or infrastructure management
-- **@performance** — Use for profiling, bottleneck analysis, and optimization recommendations
+- **@orchestrator** — Use for complex multi-step tasks. It breaks down the request and dispatches specialists in the correct pipeline order.
+- **@ask** — Use when requirements are unclear, ambiguous, or you need user input before proceeding.
+- **@plan** — Use for design decisions, architecture planning, technology comparison, evidence-based recommendations, and multi-file implementation plans. Run before @build.
+- **@build** — Use for implementing features, writing code, making direct code changes, and improving existing code structure without changing behavior.
+- **@quality** — Use after @build to investigate failures, write and run tests, and gate changes with reviews. Blocks @docs and @delivery until checks pass.
+- **@defensive-security** — Use after @build for vulnerability audits, dependency checks, hardening, and compliance evaluation. Runs in parallel with @quality. Never use for exploitation.
+- **@hacking** — Use only for authorized offensive work: penetration testing, CTF challenges, exploit development, and red-team operations. Keep separate from defensive audits.
+- **@delivery** — Use last for version control, branch and PR work, semver and changelogs, CI/CD pipelines, Docker builds, and deployment preparation.
+- **@docs** — Use after @quality passes to create or update READMEs, API documentation, guides, and code comments.
 
 ## Skills
 
@@ -157,7 +148,6 @@ Skills are domain-specific knowledge packs loaded on demand. They complement age
 
 | Skill | Purpose | Use when |
 |-------|---------|----------|
-| **api-docs** | Generate API documentation from code | Documenting endpoints, generating OpenAPI specs |
 | **api-scaffold** | Generate API endpoints and handlers | Adding new API routes, scaffolding CRUD operations |
 | **auth** | Authentication and authorization systems | Adding login, JWT, OAuth, RBAC, permissions |
 | **ci-pipeline** | CI/CD pipeline configurations | Setting up GitHub Actions, GitLab CI, deploy workflows |
@@ -167,6 +157,7 @@ Skills are domain-specific knowledge packs loaded on demand. They complement age
 | **dockerize** | Dockerfiles and docker-compose configs | Containerizing apps, optimizing Docker builds |
 | **frontend** | UI components and frontend architecture | Building React/Vue/Svelte components, state management |
 | **git-workflow** | Branching strategies and PR automation | Setting up PR templates, commit conventions, branch protection |
+| **gpb-to-mxb** | Converts PiBoSo GPBikes mods to MX Bikes | Use when converting GPBikes mods to MX Bikes, porting bikes/tracks/tyres |
 | **performance** | Profiling and optimization | Investigating slowness, reducing bundle size, optimizing queries |
 | **testing** | Test strategy and comprehensive test suites | Planning test coverage, designing test architecture |
 
